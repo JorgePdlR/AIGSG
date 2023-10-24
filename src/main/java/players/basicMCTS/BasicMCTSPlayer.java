@@ -62,7 +62,7 @@ public class BasicMCTSPlayer extends AbstractPlayer {
 
     @Override
     public String toString() {
-        return "BasicMCTS";
+        return "BasicMCTS"+this.params.rolloutLength;
     }
 
     @Override
