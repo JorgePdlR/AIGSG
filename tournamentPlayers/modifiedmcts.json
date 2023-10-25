@@ -1,0 +1,13 @@
+{
+  "class" : "players.ModifiedMCTS.ModifiedMCTSParams",
+  "K" : 1.4142,
+  "rolloutLength" : 15,
+  "maxTreeDepth" : 15,
+  "heuristic" : {
+    "class" : "players.heuristics.ScoreHeuristic"
+  },
+  "budgetType" : "BUDGET_TIME",
+  "budget" : 200,
+  "reflexiveIterations" : 20,
+  "metamctsCalls" : 2
+}
