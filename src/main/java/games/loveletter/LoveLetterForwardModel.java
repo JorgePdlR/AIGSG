@@ -320,7 +320,7 @@ public class LoveLetterForwardModel extends StandardForwardModel implements ITre
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState gameState, ActionSpace actionSpace) {
         LoveLetterGameState llgs = (LoveLetterGameState)gameState;
-        if (llgs.getPlayerResults()[llgs.getCurrentPlayer()] == CoreConstants.GameResult.LOSE_ROUND)
+        if (llgs.getPlayerResults()[llgs.getCurrentPlayer()] == GameResult.LOSE_ROUND)
             throw new AssertionError("???.");
 
         Set<AbstractAction> actions = new HashSet<>();

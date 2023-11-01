@@ -60,10 +60,10 @@ public class FrenchCard extends Card {
     public static Deck<FrenchCard> generateDeck(String name, CoreConstants.VisibilityMode visibilityMode) {
         Deck<FrenchCard> deck = new Deck<>(name, visibilityMode);
         for (Suite suite : Suite.values()){
-            for (FrenchCard.FrenchCardType type: FrenchCard.FrenchCardType.values()) {
-                if (type == FrenchCard.FrenchCardType.Number) {
+            for (FrenchCardType type: FrenchCardType.values()) {
+                if (type == FrenchCardType.Number) {
                     for (int number : numbers) {
-                        deck.add(new FrenchCard(FrenchCard.FrenchCardType.Number, suite, number));
+                        deck.add(new FrenchCard(FrenchCardType.Number, suite, number));
                     }
                 } else {
                     deck.add(new FrenchCard(type, suite));

@@ -154,7 +154,7 @@ public class CatanGUI extends AbstractGUIManager implements IScreenHighlight {
         boardView.clearHighlights();
     }
     protected void scrollActionPanelToTop(ActionButton button) {
-        javax.swing.SwingUtilities.invokeLater(() -> actionScrollPane.getVerticalScrollBar().setValue(0));
+        SwingUtilities.invokeLater(() -> actionScrollPane.getVerticalScrollBar().setValue(0));
     }
 
     protected JComponent createActionPanel(IScreenHighlight[] highlights, int width, int height, boolean boxLayout,

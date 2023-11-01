@@ -272,7 +272,7 @@ public class PyTAG {
         AbstractPlayer currentPlayer = players.get(activePlayer);
         while ( !(currentPlayer instanceof PythonAgent)){
             AbstractGameState observation = gameState.copy(activePlayer);
-            List<core.actions.AbstractAction> observedActions = forwardModel.computeAvailableActions(observation);
+            List<AbstractAction> observedActions = forwardModel.computeAvailableActions(observation);
 
             if (isDone()){
                 // game is over
@@ -283,7 +283,7 @@ public class PyTAG {
             gameState.playerTimer[activePlayer].resume();
 
             // Either ask player which action to use or, in case no actions are available, report the updated observation
-            core.actions.AbstractAction action = null;
+            AbstractAction action = null;
             if (observedActions.size() > 0) {
                 if (observedActions.size() == 1 && (!(currentPlayer instanceof HumanGUIPlayer) || observedActions.get(0) instanceof DoNothing)) {
                     // Can only do 1 action, so do it.

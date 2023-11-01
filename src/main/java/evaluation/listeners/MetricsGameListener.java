@@ -18,7 +18,7 @@ import static evaluation.metrics.IDataLogger.ReportType.*;
 
 /**
  * Main Game Listener class. An instance can be attached to a game, which will then cause registered metrics in this
- * class to record data about the game when specific game events occur, see {@link evaluation.metrics.Event.GameEvent}.
+ * class to record data about the game when specific game events occur, see {@link Event.GameEvent}.
  * ---
  * Subclasses can be implemented for custom functionality, but they are not necessary. All that is necessary is to
  * set up a metrics class that implements the interface {@link IMetricsCollection}, check this for more information.

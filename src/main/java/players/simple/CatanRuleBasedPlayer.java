@@ -1,4 +1,4 @@
-//package players.simple;
+package players.simple;//package players.simple;
 //
 //import core.AbstractGameState;
 //import core.AbstractPlayer;

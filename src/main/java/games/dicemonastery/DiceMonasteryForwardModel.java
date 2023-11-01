@@ -241,7 +241,7 @@ public class DiceMonasteryForwardModel extends StandardForwardModel {
                 }
                 break;
             case SUMMER:
-                switch ((DiceMonasteryConstants.Phase) state.getGamePhase()) {
+                switch ((Phase) state.getGamePhase()) {
                     case BID:
                         nextPlayer = (currentPlayer + 1) % state.getNPlayers();
                         if (state.allBidsIn()) {

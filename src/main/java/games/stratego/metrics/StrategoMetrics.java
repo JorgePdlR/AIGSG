@@ -48,7 +48,7 @@ public class StrategoMetrics implements IMetricsCollection {
 
         @Override
         public Set<IGameEvent> getDefaultEventTypes() {
-            return Collections.singleton(StrategoMetrics.StrategoEvent.EndCondition);
+            return Collections.singleton(StrategoEvent.EndCondition);
         }
     }
 

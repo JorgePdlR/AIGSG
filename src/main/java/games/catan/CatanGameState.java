@@ -638,7 +638,7 @@ public class CatanGameState extends AbstractGameState {
         }
         // check if we have a road next to the intended settlement owned by the player
         // Doesn't apply in the setup phase
-        if (!getGamePhase().equals(CatanGameState.CatanGamePhase.Setup)) {
+        if (!getGamePhase().equals(CatanGamePhase.Setup)) {
             for (Map.Entry<Edge, BoardNodeWithEdges> e : neighboursWithRoads.entrySet()) {
                 if (e.getKey().getOwnerId() == player) {
                     return true;

@@ -24,8 +24,8 @@ public class Wonders7Constants {
     }
 
     @SafeVarargs
-    public static List<Map<Resource, Long>> createHashList(Map<Wonders7Constants.Resource, Long>... hashmaps){
-        List<Map<Wonders7Constants.Resource, Long>> list = new ArrayList<>();
+    public static List<Map<Resource, Long>> createHashList(Map<Resource, Long>... hashmaps){
+        List<Map<Resource, Long>> list = new ArrayList<>();
         Collections.addAll(list, hashmaps);
         return list;
     }

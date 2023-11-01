@@ -22,7 +22,7 @@ public class PuertoRicoGameState extends AbstractGameState {
     List<Plantation> quarries;
     Map<PuertoRicoConstants.BuildingType, Integer> buildingsAvailable;
     List<PRPlayerBoard> playerBoards;
-    EnumMap<PuertoRicoConstants.Crop, Integer> cropSupply;
+    EnumMap<Crop, Integer> cropSupply;
     EnumMap<Role, Boolean> rolesAvailable;
     Map<Role, Integer> moneyOnRoles;
     Role currentRole;

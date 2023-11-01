@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class AITableModel extends AbstractTableModel {
 
-    List<core.actions.AbstractAction> keys = new ArrayList<>();
+    List<AbstractAction> keys = new ArrayList<>();
     List<String> columnNames = new ArrayList<>();
     List<Class<?>> dataClasses = new ArrayList<>();
     List<List<Object>> dataValues = new ArrayList<>();
 
-    public AITableModel(Map<core.actions.AbstractAction, Map<String, Object>> data) {
+    public AITableModel(Map<AbstractAction, Map<String, Object>> data) {
         for (AbstractAction action : data.keySet()) {
             keys.add(action);
             Map<String, Object> localData = data.get(action);

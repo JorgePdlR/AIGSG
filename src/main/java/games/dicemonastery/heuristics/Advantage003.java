@@ -1,4 +1,4 @@
-//package games.dicemonastery.heuristics;
+package games.dicemonastery.heuristics;//package games.dicemonastery.heuristics;
 //
 //import core.AbstractGameState;
 //import core.AbstractPlayer;
