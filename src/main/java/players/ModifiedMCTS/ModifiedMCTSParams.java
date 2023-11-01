@@ -15,7 +15,7 @@ public class ModifiedMCTSParams extends PlayerParameters {
     public double epsilon = 1e-6;
     public IStateHeuristic heuristic = AbstractGameState::getHeuristicScore;
     public int reflexiveIterations = 3;
-    public int metamctsCalls = 4;
+    public int metamctsCalls = 1;
 
     public ModifiedMCTSParams() {
         this(System.currentTimeMillis());
@@ -29,7 +29,7 @@ public class ModifiedMCTSParams extends PlayerParameters {
         addTunableParameter("epsilon", 1e-6);
         addTunableParameter("heuristic", (IStateHeuristic) AbstractGameState::getHeuristicScore);
         addTunableParameter("reflexiveIterations", 3, Arrays.asList(1, 3, 10, 30, 100));
-        addTunableParameter("metamctsCalls", 4, Arrays.asList(1, 3, 10, 30, 100));
+        addTunableParameter("metamctsCalls", 1, Arrays.asList(1, 2, 3, 4, 5));
     }
 
     @Override

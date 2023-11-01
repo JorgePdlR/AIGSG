@@ -101,6 +101,7 @@ class ModifiedTreeNode {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = elapsedTimer.remainingTimeMillis();
+                System.out.printf("acumTimeTaken %f avgTimeTaken %f remaining %d\n",acumTimeTaken, avgTimeTaken, remaining);
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
             } else if (budgetType == BUDGET_ITERATIONS) {
                 // Iteration budget
@@ -274,31 +275,36 @@ class ModifiedTreeNode {
     private double rollOut() {
         int rolloutDepth = 0; // counting from end of tree
         AbstractAction next;
+        AbstractAction[] nextActions;
+
         int roundCounter = state.getRoundCounter();
 
+        ////////////////////////////////////////////////////////////////
         // If rollouts are enabled, select actions for the rollout in line with the rollout policy
         AbstractGameState rolloutState = state.copy();
+
         if (player.params.rolloutLength > 0) {
             // $$$ Round counter should remain this way ?
-            while (!finishRollout(rolloutState, rolloutDepth) && roundCounter == rolloutState.getRoundCounter()) {
-                ////////////////////////////////////////////////////////////////
+            // $$$ Don't restrict exploring of meta monte carlo, lets apply the restriction for this turn
+            // just to reflexive MCTS
+            while (!finishRollout(rolloutState, rolloutDepth) &&
+                    (metamcts > 0 && roundCounter == rolloutState.getRoundCounter())) {
                 // Use Meta monte carlo just when is our turn
                 if (metamcts > 0 && (rolloutState.getTurnOwner() == this.player.getPlayerID())) {
+                //if (metamcts > 0 ) {
                     ModifiedTreeNode reflexiveRoot = new ModifiedTreeNode(this.player, null, rolloutState, rnd);
                     reflexiveRoot.metamcts = metamcts - 1;
                     reflexiveRoot.mctsSearch();
                     next = reflexiveRoot.bestAction();
+                    nextActions = reflexiveRoot.listOfBestActions(2);
+
                 }
                 else {
                     next = randomPlayer.getAction(rolloutState, randomPlayer.getForwardModel().computeAvailableActions(rolloutState, randomPlayer.parameters.actionSpace));
                 }
-                ////////////////////////////////////////////////////////////////
-
-
-
-
                 advance(rolloutState, next);
                 rolloutDepth++;
+                ////////////////////////////////////////////////////////////////
             }
         }
         // Evaluate final state and return normalised score
@@ -368,6 +374,72 @@ class ModifiedTreeNode {
         }
 
         return bestAction;
+    }
+
+    /**
+     * Calculates the best actions from the root according to the most visited nodes
+     *
+     * @return - the array of best AbstractAction
+     */
+    AbstractAction[] listOfBestActions(int size) {
+        double[] bestValues;
+        AbstractAction[] bestActions;
+
+        bestActions = new AbstractAction[size];
+        bestValues  = new double[size];
+
+        // Initialize best values array
+        for (int i = 0 ; i < size ; i++){
+            bestValues[i]  = -Double.MAX_VALUE;
+            bestActions[i] = null;
+        }
+
+        for (AbstractAction action : children.keySet()) {
+            if (children.get(action) != null) {
+                ModifiedTreeNode node = children.get(action);
+                double childValue = node.nVisits;
+
+                // Apply small noise to break ties randomly
+                childValue = noise(childValue, player.params.epsilon, player.rnd.nextDouble());
+
+                // Save best value (highest visit count)
+                if (size == 1 && childValue > bestValues[0]) {
+                    bestValues[0] = childValue;
+                    bestActions[0] = action;
+                }
+                for (int i = 0 ; i < size - 1; i++){
+                    if (childValue > bestValues[i]){
+                        // Move to the right all elements
+                        for(int j = i; j < size - 1; j++){
+                            double temp       = 0;
+                            AbstractAction tempAction;
+
+                            // Update values
+                            temp              = bestValues[j + 1];
+                            bestValues[j + 1] = bestValues[i];
+                            bestValues[i]     = temp;
+
+                            // Update actions
+                            tempAction         = bestActions[j + 1];
+                            bestActions[j + 1] = bestActions[i];
+                            bestActions[i]      = tempAction;
+
+                        }
+
+                        // Assign action in the corresponding place
+                        bestValues[i] = childValue;
+                        bestActions[i] = action;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (bestActions[0] == null) {
+            throw new AssertionError("Unexpected - no selection made.");
+        }
+
+        return bestActions;
     }
 
 }

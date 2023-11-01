@@ -34,7 +34,7 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
         this.params.maxTreeDepth = 5;
         this.params.epsilon = 1e-6;
         this.params.reflexiveIterations = 3;
-        this.params.metamctsCalls = 4;
+        this.params.metamctsCalls = 1;
 
     }
 
