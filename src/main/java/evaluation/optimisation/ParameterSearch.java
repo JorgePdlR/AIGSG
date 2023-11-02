@@ -18,6 +18,7 @@ import static utilities.Utils.getArg;
 public class ParameterSearch {
 
     public static void main(String[] args) {
+        System.out.println("Starting at:"+(new Date()));
         List<String> argsList = Arrays.asList(args);
         if (argsList.contains("--help") || argsList.contains("-h")) {
             RunArg.printHelp(RunArg.Usage.ParameterSearch);
@@ -72,6 +73,7 @@ public class ParameterSearch {
             NTBEA singleNTBEA = new NTBEA(params, game, nPlayers);
             singleNTBEA.run();
         }
+        System.out.println("Ending at:"+(new Date()));
     }
 
 
