@@ -9,7 +9,7 @@
   "output" : "RHEA_GridSearchTournament.log",
   "opponent": "json/tournamentPlayers/",
 
-  "searchSpace": "json/parameterSearch/rhea_searchspace1.json",
+  "searchSpace": "json/parameterSearch/rhea_searchspace2.json",
   "verbose": true,
   "seed": 740234
 }
