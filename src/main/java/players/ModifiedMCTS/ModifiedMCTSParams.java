@@ -16,6 +16,11 @@ public class ModifiedMCTSParams extends PlayerParameters {
     public IStateHeuristic heuristic = AbstractGameState::getHeuristicScore;
     public int reflexiveIterations = 3;
     public int metamctsCalls = 1;
+    // How many times will we call reflexive in the current MCTS
+    public int reflexiveCalls = 3;
+
+    public boolean reflexiveInOpponent = false;
+    public boolean currentRound = false;
 
     public ModifiedMCTSParams() {
         this(System.currentTimeMillis());
@@ -30,6 +35,9 @@ public class ModifiedMCTSParams extends PlayerParameters {
         addTunableParameter("heuristic", (IStateHeuristic) AbstractGameState::getHeuristicScore);
         addTunableParameter("reflexiveIterations", 3, Arrays.asList(1, 3, 10, 30, 100));
         addTunableParameter("metamctsCalls", 1, Arrays.asList(1, 2, 3, 4, 5));
+        addTunableParameter("reflexiveCalls", 3, Arrays.asList(3, 6, 9, 12, 15));
+        addTunableParameter("reflexiveInOpponent", false, Arrays.asList(false, true));
+        addTunableParameter("currentRound", false, Arrays.asList(false, true));
     }
 
     @Override
@@ -42,6 +50,9 @@ public class ModifiedMCTSParams extends PlayerParameters {
         heuristic = (IStateHeuristic) getParameterValue("heuristic");
         reflexiveIterations = (int) getParameterValue("reflexiveIterations");
         metamctsCalls = (int) getParameterValue("metamctsCalls");
+        reflexiveCalls = (int) getParameterValue("reflexiveCalls");
+        reflexiveInOpponent = (boolean) getParameterValue("reflexiveInOpponent");
+        currentRound = (boolean) getParameterValue("currentRound");
     }
 
     @Override

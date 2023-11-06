@@ -10,7 +10,7 @@
   "budget" : 999,
   "reflexiveIterations" : 54,
   "metamctsCalls" : 1,
-  "reflexiveInOpponent" : false,
-  "reflexiveCalls" : 12,
+  "reflexiveInOpponent" : true,
+  "reflexiveCalls" : 24,
   "currentRound" : true
 }

@@ -1,12 +1,11 @@
 {
   "game" : "SushiGo",
-  "nPlayers" : 2,
-  "mode" : "exhaustive",
-  "matchups" : 5,
-  "verbose" : false,
-  "seed" : 740234,
+  "nPlayers" : 3,
+  "mode" : "random",
+  "matchups" : 500,
+  "verbose" : true,
   "listener" : "json/listeners/basiclistener.json",
   "destDir" : "outputDir",
-  "output" : "outputDir/sushiGo01.log",
+  "output" : "outputDir/sushiGoTournament.log",
   "playerDirectory" : "tournamentPlayersTest"
 }

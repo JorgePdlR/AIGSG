@@ -35,6 +35,9 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
         this.params.epsilon = 1e-6;
         this.params.reflexiveIterations = 3;
         this.params.metamctsCalls = 1;
+        this.params.reflexiveCalls = 3;
+        this.params.reflexiveInOpponent = false;
+        this.params.currentRound = false;
 
     }
 
@@ -49,7 +52,7 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
         // Search for best action from the root
         ModifiedTreeNode root = new ModifiedTreeNode(this, null, gameState, rnd);
 
-        // metamctsSearch does all of the hard work
+        // metamctsSearch does all the hard work
         root.metamctsSearch();
 
         // Return best action
@@ -64,7 +67,7 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
 
     @Override
     public String toString() {
-        return "Modified MCTS";
+        return "RMCTS: MCALLS " + Integer.toString(this.params.metamctsCalls) + " CR " + Boolean.toString(this.params.currentRound) + " RO " + Boolean.toString(this.params.reflexiveInOpponent);
     }
 
     @Override

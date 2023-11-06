@@ -40,7 +40,12 @@ class ModifiedTreeNode {
     // State in this node (closed loop)
     private AbstractGameState state;
 
+    // Level of reflexive call, if metamctsCalls = 1 that means that MCTS will be called once at level 1 and once at
+    // level 0. metamcts variable indicates in which level we are. If we are in level 0 no more calls should be
+    // performed to MCTS
     private int metamcts;
+
+    private int reflexiveNumberCalls;
 
     protected ModifiedTreeNode(ModifiedMCTSPlayer player, ModifiedTreeNode parent, AbstractGameState state, Random rnd) {
         this.player = player;
@@ -65,11 +70,12 @@ class ModifiedTreeNode {
         // Variables for tracking time budget
         double avgTimeTaken;
         double acumTimeTaken = 0;
-        long remaining;
+        long remaining = 0;
         int remainingLimit = player.params.breakMS;
         ElapsedCpuTimer elapsedTimer = new ElapsedCpuTimer();
         if (player.params.budgetType == BUDGET_TIME) {
             elapsedTimer.setMaxTimeMillis(player.params.budget);
+            remaining = elapsedTimer.remainingTimeMillis();
         }
 
         // Tracking number of iterations for iteration budget
@@ -87,8 +93,10 @@ class ModifiedTreeNode {
             // Set metamcts calls
             selected.metamcts = player.params.metamctsCalls;
 
+            selected.reflexiveNumberCalls = player.params.reflexiveCalls;
+
             // Monte carlo rollout: return value of MC rollout from the newly added node
-            double delta = selected.rollOut();
+            double delta = selected.rollOut(remaining);
             // Back up the value of the rollout through the tree
             selected.backUp(delta);
             // Finished iteration
@@ -101,7 +109,10 @@ class ModifiedTreeNode {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = elapsedTimer.remainingTimeMillis();
-                System.out.printf("acumTimeTaken %f avgTimeTaken %f remaining %d\n",acumTimeTaken, avgTimeTaken, remaining);
+                // $$$ REMOVE
+                if (remaining < 0) {
+                    System.out.printf("WARNING: acumTimeTaken %f avgTimeTaken %f remaining %d\n", acumTimeTaken, avgTimeTaken, remaining);
+                }
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
             } else if (budgetType == BUDGET_ITERATIONS) {
                 // Iteration budget
@@ -117,7 +128,16 @@ class ModifiedTreeNode {
      * inside the current MCTS search. In other words we are doing
      * reflexive Monte Carlo by calling MCTS inside MCTS
      */
-    void mctsSearch() {
+    void mctsSearch(long timeRemaining) {
+        double avgTimeTaken;
+        double acumTimeTaken = 0;
+        long remaining;
+        ElapsedCpuTimer elapsedTimer = new ElapsedCpuTimer();
+
+        if (player.params.budgetType == BUDGET_TIME) {
+            elapsedTimer.setMaxTimeMillis(timeRemaining);
+        }
+
         // Tracking number of iterations for iteration budget
         int numIters = 0;
 
@@ -134,15 +154,27 @@ class ModifiedTreeNode {
             selected.metamcts = this.metamcts;
 
             // Monte carlo rollout: return value of MC rollout from the newly added node
-            double delta = selected.rollOut();
+            double delta = selected.rollOut(timeRemaining);
             // Back up the value of the rollout through the tree
             selected.backUp(delta);
             // Finished iteration
             numIters++;
 
             // Check stopping condition.
-            // Since we are in reflexive MCTS stop after number of iterations is reached
-            stop = numIters >= player.params.reflexiveIterations;
+            if (player.params.budgetType == BUDGET_TIME) {
+                // Time budget
+                acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
+                avgTimeTaken = acumTimeTaken / numIters;
+                remaining = elapsedTimer.remainingTimeMillis();
+                // $$$ REMOVE
+                if (remaining < 0) {
+                    System.out.printf("WARNING reflexive: acumTimeTaken %f avgTimeTaken %f remaining %d\n", acumTimeTaken, avgTimeTaken, remaining);
+                }
+                stop = numIters >= player.params.reflexiveIterations || remaining <= 2 * avgTimeTaken || remaining <= timeRemaining * .95;
+            } else {
+                // Since we are in reflexive MCTS stop after number of iterations is reached
+                stop = numIters >= player.params.reflexiveIterations;
+            }
         }
     }
 
@@ -272,7 +304,7 @@ class ModifiedTreeNode {
      *
      * @return - value of rollout.
      */
-    private double rollOut() {
+    private double rollOut(long remaining) {
         int rolloutDepth = 0; // counting from end of tree
         AbstractAction next;
         AbstractAction[] nextActions;
@@ -287,25 +319,28 @@ class ModifiedTreeNode {
             // $$$ Round counter should remain this way ?
             // $$$ Don't restrict exploring of meta monte carlo, lets apply the restriction for this turn
             // just to reflexive MCTS
-            while (!finishRollout(rolloutState, rolloutDepth) &&
-                    (metamcts > 0 && roundCounter == rolloutState.getRoundCounter())) {
-                // Use Meta monte carlo just when is our turn
-                if (metamcts > 0 && (rolloutState.getTurnOwner() == this.player.getPlayerID())) {
-                //if (metamcts > 0 ) {
+            while (!finishRollout(rolloutState, rolloutDepth) && (!player.params.currentRound || roundCounter == rolloutState.getRoundCounter())) {
+                // Use reflexive monte carlo just when is our turn if reflexiveInOpponent is false, otherwise use also reflexive
+                // Monte Carlo in opponents turn.
+                if (metamcts > 0 && reflexiveNumberCalls > 0 &&
+                        (player.params.reflexiveInOpponent || (rolloutState.getTurnOwner() == this.player.getPlayerID()))){
                     ModifiedTreeNode reflexiveRoot = new ModifiedTreeNode(this.player, null, rolloutState, rnd);
-                    reflexiveRoot.metamcts = metamcts - 1;
-                    reflexiveRoot.mctsSearch();
+                    reflexiveRoot.metamcts -= 1;
+                    reflexiveRoot.mctsSearch(remaining);
                     next = reflexiveRoot.bestAction();
+                    // $$$ Not used, may remove
                     nextActions = reflexiveRoot.listOfBestActions(2);
-
+                    reflexiveNumberCalls--;
                 }
+                // Get random action when we are not in meta Monte Carlo, or if we are in meta Monte Carlo, it is the
+                // opponents turn and reflexiveInOpponent is false
                 else {
                     next = randomPlayer.getAction(rolloutState, randomPlayer.getForwardModel().computeAvailableActions(rolloutState, randomPlayer.parameters.actionSpace));
                 }
                 advance(rolloutState, next);
                 rolloutDepth++;
-                ////////////////////////////////////////////////////////////////
             }
+                ///////////////////////////////////////////////////////////////
         }
         // Evaluate final state and return normalised score
         double value = player.params.getHeuristic().evaluateState(rolloutState, player.getPlayerID());

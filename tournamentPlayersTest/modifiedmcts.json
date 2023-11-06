@@ -12,5 +12,5 @@
   "metamctsCalls" : 1,
   "reflexiveInOpponent" : false,
   "reflexiveCalls" : 12,
-  "currentRound" : true
+  "currentRound" : false
 }
