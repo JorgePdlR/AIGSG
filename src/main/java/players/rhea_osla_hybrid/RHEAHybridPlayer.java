@@ -48,7 +48,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
 
     @Override
     public AbstractAction _getAction(AbstractGameState stateObs, List<AbstractAction> possibleActions) {
-        System.out.println("_getAction");
         ElapsedCpuTimer timer = new ElapsedCpuTimer();  // New timer for this game tick
         timer.setMaxTimeMillis(params.budget);
         numIters = 0;
@@ -72,10 +71,8 @@ public class RHEAHybridPlayer extends AbstractPlayer {
 //        }
         // Initialise individuals
         if (params.shiftLeft && !population.isEmpty()) {
-            System.out.println("population size: "+population.size());
             population.forEach(i -> i.value = Double.NEGATIVE_INFINITY);  // so that any we don't have time to shift are ignored when picking an action
             for (RHEAIndividual genome : population) {
-                System.out.println("RHEAIndividual genome :"+genome.toString());
                 if (!budgetLeft(timer)) break;
                 System.arraycopy(genome.actions, 1, genome.actions, 0, genome.actions.length - 1);
                 // we shift all actions along, and then rollout with repair
@@ -87,30 +84,22 @@ public class RHEAHybridPlayer extends AbstractPlayer {
         }
         else {
             population = new ArrayList<>();
-            System.out.println("RHEA forward model:"+getForwardModel());
             oslaPlayer.setForwardModel(getForwardModel());
-            System.out.println("osla forward model: "+oslaPlayer.getForwardModel());
             RHEAIndividual individual = new RHEAIndividual(params.horizon, params.discountFactor, getForwardModel(), stateObs,
-                    getPlayerID(), randomGenerator, params.heuristic, oslaPlayer);
-            System.out.println("\tFirst Individual: "+individual.toString());
+                    getPlayerID(), randomGenerator, params.heuristic,
+                    oslaPlayer
+            );
             population.add(individual);
             for (int i = 1; i < params.populationSize; ++i) {
-                System.out.println("\ti & params.populationSize: "+i+"/"+params.populationSize);
-                System.out.println("\tIndividual i="+i+" of params.populationSize "+params.populationSize);
-                System.out.println("Timer:"+timer);
                 if (!budgetLeft(timer)) break;
                 RHEAIndividual new_individual = new RHEAIndividual(individual);
-                System.out.println("\tMutate first individual");
                 Pair<Integer, Integer> calls = new_individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
                 population.add(new_individual);
                 fmCalls += calls.a;
                 copyCalls += calls.b;
                 repairCount += individual.repairCount;
                 nonRepairCount += individual.nonRepairCount;
-                System.out.println("\tNew Individual Created:"+new_individual.toString());
-                System.out.println("\tpopulation size: "+population.size());
             }
-            System.out.println("\tInitial Population created: "+population.size());
         }
 
         population.sort(Comparator.naturalOrder());
@@ -154,7 +143,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     private RHEAIndividual crossover(RHEAIndividual p1, RHEAIndividual p2) {
-        System.out.println("RHEAIndividual crossover");
         switch (params.crossoverType) {
             case NONE: // we just take the first parent
                 return new RHEAIndividual(p1);
@@ -170,7 +158,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     private RHEAIndividual uniformCrossover(RHEAIndividual p1, RHEAIndividual p2) {
-        System.out.println("RHEAIndividual uniformCrossover");
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
         int min = Math.min(p1.length, p2.length);
@@ -184,7 +171,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     private RHEAIndividual onePointCrossover(RHEAIndividual p1, RHEAIndividual p2) {
-        System.out.println("RHEAIndividual onePointCrossover");
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
         int tailLength = Math.min(p1.length, p2.length) / 2;
@@ -197,7 +183,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     private RHEAIndividual twoPointCrossover(RHEAIndividual p1, RHEAIndividual p2) {
-        System.out.println("RHEAIndividual twoPointCrossover");
         RHEAIndividual child = new RHEAIndividual(p1);
         copyCalls += child.length;
         int tailLength = Math.min(p1.length, p2.length) / 3;
@@ -211,7 +196,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     RHEAIndividual[] selectParents() {
-        System.out.println("RHEAIndividual[] selectParents()");
         RHEAIndividual[] parents = new RHEAIndividual[2];
 
         switch (params.selectionType) {
@@ -231,7 +215,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     RHEAIndividual tournamentSelection() {
-        System.out.println("RHEAIndividual tournamentSelection()");
         RHEAIndividual best = null;
         for (int i = 0; i < params.tournamentSize; ++i) {
             int rand = randomGenerator.nextInt(population.size());
@@ -244,7 +227,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
     }
 
     RHEAIndividual rankSelection() {
-        System.out.println("RHEAIndividual rankSelection()");
         population.sort(Comparator.naturalOrder());
         int rankSum = 0;
         for (int i = 0; i < population.size(); ++i)
@@ -263,7 +245,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
      * Run evolutionary process for one generation
      */
     private void runIteration() {
-        System.out.println("private void runIteration()");
         //copy elites
         List<RHEAIndividual> newPopulation = new ArrayList<>();
         for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
@@ -277,7 +258,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
         }
 
         for (RHEAIndividual individual : population) {
-            System.out.println("CALLING MUTATION FOR runIteration");
             Pair<Integer, Integer> calls = individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
             fmCalls += calls.a;
             copyCalls += calls.b;
