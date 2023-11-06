@@ -1,5 +1,5 @@
 {
-	"class" : "players.rhea.RHEAParams",
+	"class" : "players.rhea_osla_hybrid.RHEAHybridParams",
 	"horizon": 15,
 	"populationSize": 10,
 	"discountFactor": 0.900,
