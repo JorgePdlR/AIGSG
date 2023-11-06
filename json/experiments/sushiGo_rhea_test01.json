@@ -1,0 +1,11 @@
+{
+  "game" : "SushiGo",
+  "nPlayers" : 2,
+  "matchups" : 1,
+  "verbose" : false,
+  "seed" : 740234,
+  "listener" : "json/listeners/basiclistener.json",
+  "destDir" : "outputDir",
+  "output" : "outputDir/experiment01.log",
+  "playerDirectory" : "json/experimentPlayers"
+}

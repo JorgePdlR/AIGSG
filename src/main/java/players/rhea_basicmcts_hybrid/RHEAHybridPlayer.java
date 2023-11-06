@@ -1,45 +1,49 @@
-package players.rhea;
+package players.rhea_basicmcts_hybrid;
 
 import core.AbstractGameState;
 import core.AbstractPlayer;
 import core.actions.AbstractAction;
 import players.PlayerConstants;
-import players.mcts.MASTPlayer;
-import players.simple.RandomPlayer;
 import utilities.ElapsedCpuTimer;
 import utilities.Pair;
-import utilities.Utils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class RHEAPlayer extends AbstractPlayer {
-    private static final AbstractPlayer randomPlayer = new RandomPlayer();
-    private final Random randomGenerator;
-    RHEAParams params;
+public class RHEAHybridPlayer extends AbstractPlayer {
+    protected Random randomGenerator;
+
+    RHEAHybridParams params;
+    BasicMCTSParams mcts_params;
+    BasicMCTSPlayer mctsPlayer;
+
     List<Map<Object, Pair<Integer, Double>>> MASTStatistics; // a list of one Map per player. Action -> (visits, totValue)
     protected List<RHEAIndividual> population = new ArrayList<>();
     // Budgets
     protected double timePerIteration = 0, timeTaken = 0, initTime = 0;
     protected int numIters = 0;
+    protected int generations = 0;
     protected int fmCalls = 0;
     protected int copyCalls = 0;
     protected int repairCount, nonRepairCount;
-    private MASTPlayer mastPlayer;
 
-    public RHEAPlayer() {
+    public RHEAHybridPlayer() {
         this(System.currentTimeMillis());
     }
 
-    public RHEAPlayer(RHEAParams params) {
+    public RHEAHybridPlayer(RHEAHybridParams params) {
+        System.out.println("Instantiating RHEAHybridPlayer with RHEAHybridParams params");
         randomGenerator = new Random(params.getRandomSeed());
         this.params = params;
         this.parameters = params;
-        setName("rhea");
+        this.mctsPlayer = new BasicMCTSPlayer(System.currentTimeMillis());
+        this.mcts_params = new BasicMCTSParams();
+        mcts_params.rolloutLength = params.mcts_rolloutLength;
+        this.mctsPlayer.parameters = mcts_params;
+        setName("rhea_mcts_hybrid");
     }
 
-    public RHEAPlayer(long seed) {
-        this(new RHEAParams(seed));
+    public RHEAHybridPlayer(long seed) {
+        this(new RHEAHybridParams(seed));
     }
 
     @Override
@@ -48,6 +52,9 @@ public class RHEAPlayer extends AbstractPlayer {
         for (int i = 0; i < state.getNPlayers(); i++)
             MASTStatistics.add(new HashMap<>());
         population = new ArrayList<>();
+        mcts_params = new BasicMCTSParams();
+        mcts_params.rolloutLength = params.mcts_rolloutLength;
+        mctsPlayer.parameters = mcts_params;
     }
 
     @Override
@@ -85,14 +92,25 @@ public class RHEAPlayer extends AbstractPlayer {
                 fmCalls += calls.a;
                 copyCalls += calls.b;
             }
-        } else {
+        }
+        else {
             population = new ArrayList<>();
-            for (int i = 0; i < params.populationSize; ++i) {
+            mctsPlayer.parameters.budgetType = params.budgetType;
+            mctsPlayer.parameters.budget = params.budget/2;
+            mctsPlayer.setForwardModel(getForwardModel());
+
+            RHEAIndividual individual = new RHEAIndividual(params.horizon, params.discountFactor, getForwardModel(), stateObs,
+                    getPlayerID(), randomGenerator, params.heuristic, mctsPlayer);
+            population.add(individual);
+            for (int i = 1; i < params.populationSize; ++i) {
                 if (!budgetLeft(timer)) break;
-                population.add(new RHEAIndividual(params.horizon, params.discountFactor, getForwardModel(), stateObs,
-                        getPlayerID(), randomGenerator, params.heuristic, params.useMAST ? mastPlayer : randomPlayer));
-                fmCalls += population.get(i).length;
-                copyCalls += population.get(i).length;
+                RHEAIndividual new_individual = new RHEAIndividual(individual);
+                Pair<Integer, Integer> calls = new_individual.mutate(getForwardModel(), getPlayerID(), params.mutationCount);
+                population.add(new_individual);
+                fmCalls += calls.a;
+                copyCalls += calls.b;
+                repairCount += individual.repairCount;
+                nonRepairCount += individual.nonRepairCount;
             }
         }
 
@@ -130,10 +148,10 @@ public class RHEAPlayer extends AbstractPlayer {
     }
 
     @Override
-    public RHEAPlayer copy() {
-        RHEAParams newParams = (RHEAParams) params.copy();
+    public RHEAHybridPlayer copy() {
+        RHEAHybridParams newParams = (RHEAHybridParams) params.copy();
         newParams.setRandomSeed(randomGenerator.nextInt());
-        return new RHEAPlayer(newParams);
+        return new RHEAHybridPlayer(newParams);
     }
 
     private RHEAIndividual crossover(RHEAIndividual p1, RHEAIndividual p2) {
@@ -239,6 +257,7 @@ public class RHEAPlayer extends AbstractPlayer {
      * Run evolutionary process for one generation
      */
     private void runIteration() {
+        generations += 1;
         //copy elites
         List<RHEAIndividual> newPopulation = new ArrayList<>();
         for (int i = 0, max = Math.min(params.eliteCount, population.size()); i < max; ++i) {
@@ -257,8 +276,6 @@ public class RHEAPlayer extends AbstractPlayer {
             copyCalls += calls.b;
             repairCount += individual.repairCount;
             nonRepairCount += individual.nonRepairCount;
-            if (params.useMAST)
-                MASTBackup(individual.actions, individual.value, getPlayerID());
         }
 
         //sort
@@ -277,17 +294,17 @@ public class RHEAPlayer extends AbstractPlayer {
     }
 
 
-    protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
-        for (int i = 0; i < rolloutActions.length; i++) {
-            AbstractAction action = rolloutActions[i];
-            if (action == null)
-                break;
-            Pair<Integer, Double> stats = MASTStatistics.get(player).getOrDefault(action, new Pair<>(0, 0.0));
-            stats.a++;  // visits
-            stats.b += delta;   // value
-            MASTStatistics.get(player).put(action.copy(), stats);
-        }
-    }
+//    protected void MASTBackup(AbstractAction[] rolloutActions, double delta, int player) {
+//        for (int i = 0; i < rolloutActions.length; i++) {
+//            AbstractAction action = rolloutActions[i];
+//            if (action == null)
+//                break;
+//            Pair<Integer, Double> stats = MASTStatistics.get(player).getOrDefault(action, new Pair<>(0, 0.0));
+//            stats.a++;  // visits
+//            stats.b += delta;   // value
+//            MASTStatistics.get(player).put(action.copy(), stats);
+//        }
+//    }
 
 
 }

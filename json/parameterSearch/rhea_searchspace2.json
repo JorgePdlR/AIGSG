@@ -8,9 +8,7 @@
 
   "tournamentSize" : 5,
   "discountFactor": 0.9,
-
   "crossoverType": "UNIFORM",
-
   "selectionType" : "TOURNAMENT",
   "budgetType" : "BUDGET_TIME",
   "budget" : 999

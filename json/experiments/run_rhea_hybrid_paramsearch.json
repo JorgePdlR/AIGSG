@@ -1,0 +1,15 @@
+{
+  "game": "SushiGo",
+  "nPlayers": 3,
+  "iterations": 100,
+  "repeats": 5,
+  "matchups": 500,
+  "listener": "json/listeners/basiclistener.json",
+  "destDir" : "outputDir",
+  "output" : "RHEA_Hybrid_ParamSearchTournament.log",
+  "opponent": "json/tournamentPlayers/",
+
+  "searchSpace": "json/parameterSearch/rhea_hybrid1_searchspace1.json",
+  "verbose": true,
+  "seed": 740234
+}

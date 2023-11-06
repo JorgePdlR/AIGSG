@@ -126,6 +126,7 @@ public class NTBEA {
     public Pair<Object, int[]> run() {
 
         for (currentIteration = 0; currentIteration < params.repeats; currentIteration++) {
+            System.out.println((new Date())+"\tcurrentIteration of params.repeats:"+currentIteration+" of "+params.repeats);
             runIteration();
         }
 
@@ -251,7 +252,8 @@ public class NTBEA {
     }
 
     protected Pair<Double, Double> evaluateWinner(int[] winnerSettings) {
-
+        System.out.println("\n\nevaluateWinner");
+        System.out.println(params.evalGames+" times");
         double[] results = IntStream.range(0, params.evalGames)
                 .mapToDouble(answer -> evaluator.evaluate(winnerSettings)).toArray();
 
