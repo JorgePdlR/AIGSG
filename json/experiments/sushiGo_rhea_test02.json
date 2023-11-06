@@ -6,7 +6,7 @@
   "seed" : 740234,
   "listener" : "json/listeners/basiclistener.json",
   "destDir" : "outputDir",
-  "output" : "outputDir/experiment01.log",
-  "playerDirectory" : "json/experimentPlayers1",
+  "output" : "outputDir/experiment02.log",
+  "playerDirectory" : "json/experimentPlayers2",
   "verbose": true
 }
