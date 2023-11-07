@@ -75,6 +75,7 @@ class ModifiedTreeNode {
         ElapsedCpuTimer elapsedTimer = new ElapsedCpuTimer();
         if (player.params.budgetType == BUDGET_TIME) {
             elapsedTimer.setMaxTimeMillis(player.params.budget);
+            // Get remaining time to pass it to reflexive MCTS call
             remaining = elapsedTimer.remainingTimeMillis();
         }
 
@@ -90,9 +91,11 @@ class ModifiedTreeNode {
             // Selection + expansion: navigate tree until a node not fully expanded is found, add a new node to the tree
             ModifiedTreeNode selected = treePolicy();
 
-            // Set metamcts calls
+            // Set how many times MCTS will call MCTS in a recursive way
             selected.metamcts = player.params.metamctsCalls;
-
+            // Number of times reflexive MCTS will be used to choose best action
+            // in rollout. If we have no more calls, random actions will be used instead as
+            // basic MCTS
             selected.reflexiveNumberCalls = player.params.reflexiveCalls;
 
             // Monte carlo rollout: return value of MC rollout from the newly added node
@@ -109,10 +112,6 @@ class ModifiedTreeNode {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = elapsedTimer.remainingTimeMillis();
-                // $$$ REMOVE
-                if (remaining < 0) {
-                    System.out.printf("WARNING: acumTimeTaken %f avgTimeTaken %f remaining %d\n", acumTimeTaken, avgTimeTaken, remaining);
-                }
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
             } else if (budgetType == BUDGET_ITERATIONS) {
                 // Iteration budget
@@ -134,6 +133,7 @@ class ModifiedTreeNode {
         long remaining;
         ElapsedCpuTimer elapsedTimer = new ElapsedCpuTimer();
 
+        // If using budget time, set timer with remaining time
         if (player.params.budgetType == BUDGET_TIME) {
             elapsedTimer.setMaxTimeMillis(timeRemaining);
         }
@@ -143,6 +143,8 @@ class ModifiedTreeNode {
 
         boolean stop = false;
 
+        // In reflexive MCTS we stop if we have no more iterations, where ech iteration is
+        // treePolicy + rollOut + backpropagation
         while (!stop) {
             // New timer for this iteration
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
@@ -166,10 +168,9 @@ class ModifiedTreeNode {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = elapsedTimer.remainingTimeMillis();
-                // $$$ REMOVE
-                if (remaining < 0) {
-                    System.out.printf("WARNING reflexive: acumTimeTaken %f avgTimeTaken %f remaining %d\n", acumTimeTaken, avgTimeTaken, remaining);
-                }
+                // With budget time stop either if number of iterations is reached or there is no more
+                // time remaining with respect of a percentage of the remaining time we had before calling
+                // reflexive MCTS
                 stop = numIters >= player.params.reflexiveIterations || remaining <= 2 * avgTimeTaken || remaining <= timeRemaining * .95;
             } else {
                 // Since we are in reflexive MCTS stop after number of iterations is reached
@@ -305,42 +306,36 @@ class ModifiedTreeNode {
      * @return - value of rollout.
      */
     private double rollOut(long remaining) {
-        int rolloutDepth = 0; // counting from end of tree
-        AbstractAction next;
-        AbstractAction[] nextActions;
+        int rolloutDepth = 0;                         // counting from end of tree
+        AbstractAction next;                          // action to perform
+        int roundCounter = state.getRoundCounter();   // get current round
 
-        int roundCounter = state.getRoundCounter();
-
-        ////////////////////////////////////////////////////////////////
         // If rollouts are enabled, select actions for the rollout in line with the rollout policy
         AbstractGameState rolloutState = state.copy();
 
         if (player.params.rolloutLength > 0) {
-            // $$$ Round counter should remain this way ?
-            // $$$ Don't restrict exploring of meta monte carlo, lets apply the restriction for this turn
-            // just to reflexive MCTS
+            // Keep going while we have not reached the rolloutDepth, or if round limit is enable, stop when we change
+            // to the next round
             while (!finishRollout(rolloutState, rolloutDepth) && (!player.params.currentRound || roundCounter == rolloutState.getRoundCounter())) {
-                // Use reflexive monte carlo just when is our turn if reflexiveInOpponent is false, otherwise use also reflexive
-                // Monte Carlo in opponents turn.
+                // Use reflexive monte carlo just when is our turn if reflexiveInOpponent is false, otherwise use also
+                // reflexive Monte Carlo in opponents turn. Call MCTS just if we still have levels to call it, set in
+                // metamcts variable, if it is equal to 0 then do random rollouts.
                 if (metamcts > 0 && reflexiveNumberCalls > 0 &&
                         (player.params.reflexiveInOpponent || (rolloutState.getTurnOwner() == this.player.getPlayerID()))){
                     ModifiedTreeNode reflexiveRoot = new ModifiedTreeNode(this.player, null, rolloutState, rnd);
                     reflexiveRoot.metamcts -= 1;
                     reflexiveRoot.mctsSearch(remaining);
                     next = reflexiveRoot.bestAction();
-                    // $$$ Not used, may remove
-                    nextActions = reflexiveRoot.listOfBestActions(2);
                     reflexiveNumberCalls--;
                 }
-                // Get random action when we are not in meta Monte Carlo, or if we are in meta Monte Carlo, it is the
-                // opponents turn and reflexiveInOpponent is false
+                // Get random action when we are not in a reflexive Monte Carlo all, or if we are in meta Monte Carlo, it
+                // is the opponents turn, reflexiveInOpponent is false or we have no more reflexive calls.
                 else {
                     next = randomPlayer.getAction(rolloutState, randomPlayer.getForwardModel().computeAvailableActions(rolloutState, randomPlayer.parameters.actionSpace));
                 }
                 advance(rolloutState, next);
                 rolloutDepth++;
             }
-                ///////////////////////////////////////////////////////////////
         }
         // Evaluate final state and return normalised score
         double value = player.params.getHeuristic().evaluateState(rolloutState, player.getPlayerID());
@@ -413,6 +408,7 @@ class ModifiedTreeNode {
 
     /**
      * Calculates the best actions from the root according to the most visited nodes
+     * (Not used in current agent, left here for future agent updates)
      *
      * @return - the array of best AbstractAction
      */

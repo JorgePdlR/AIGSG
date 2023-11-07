@@ -14,12 +14,18 @@ public class ModifiedMCTSParams extends PlayerParameters {
     public int maxTreeDepth = 100; // effectively no limit
     public double epsilon = 1e-6;
     public IStateHeuristic heuristic = AbstractGameState::getHeuristicScore;
+    // Number of iterations inside the reflexive calls. Each iteration
+    // equals to running Selection/Exploration Rollout and Backpropagation
     public int reflexiveIterations = 3;
+    // Number of times "meta" MCTS. With a value of 0 equals to basic
+    // Monte Carlo. A value of 1 will call MCTS inside MCTS. A value
+    // 2 will call MCTS inside MCTS inside MCTS and so on...
     public int metamctsCalls = 1;
     // How many times will we call reflexive in the current MCTS
     public int reflexiveCalls = 3;
-
+    // Do we want to call MCTS also for opponent decisions ?
     public boolean reflexiveInOpponent = false;
+    // Restrict rollouts to the current round instead of the complete game ?
     public boolean currentRound = false;
 
     public ModifiedMCTSParams() {
