@@ -1,7 +1,7 @@
 {
 	"class" : "players.rhea.RHEAParams",
 	"horizon": 15,
-	"populationSize": 10,
+	"populationSize": 15,
 	"discountFactor": 0.900,
 	"childCount": 15,
 	"crossoverType": "UNIFORM",

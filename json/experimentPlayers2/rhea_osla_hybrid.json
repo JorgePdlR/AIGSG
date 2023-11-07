@@ -1,7 +1,7 @@
 {
 	"class" : "players.rhea_osla_hybrid.RHEAHybridParams",
 	"horizon": 15,
-	"populationSize": 15,
+	"populationSize": 10,
 	"discountFactor": 0.900,
 	"childCount": 15,
 	"crossoverType": "UNIFORM",
