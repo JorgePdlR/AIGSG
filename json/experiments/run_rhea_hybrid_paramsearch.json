@@ -9,7 +9,7 @@
   "output" : "RHEA_Hybrid_ParamSearchTournament.log",
   "opponent": "json/tournamentPlayers/",
 
-  "searchSpace": "json/parameterSearch/rhea_hybrid1_searchspace1.json",
+  "searchSpace": "json/parameterSearch/rhea_hybrid2_searchspace1.json",
   "verbose": true,
   "seed": 740234
 }

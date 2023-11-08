@@ -88,7 +88,7 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
     }
 
     /**
-     * Performs a rollout with random actions from startIndex to endIndex in the individual, from root game state gs.
+     * Performs a rollout with policy based actions from startIndex to endIndex in the individual, from root game state gs.
      * Starts by repairing the full individual, then mutates it, and finally evaluates it.
      * Evaluates the final state reached and returns the number of calls to the FM.next() function.
      *

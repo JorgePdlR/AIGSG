@@ -28,17 +28,21 @@ public class RHEAHybridPlayer extends AbstractPlayer {
 
     public RHEAHybridPlayer() {
         this(System.currentTimeMillis());
+        this.mctsPlayer = new BasicMCTSPlayer(System.currentTimeMillis());
+        this.mcts_params = new BasicMCTSParams();
+        mcts_params.rolloutLength = this.params.mcts_rolloutLength;
+        this.mctsPlayer.parameters = mcts_params;
     }
 
     public RHEAHybridPlayer(RHEAHybridParams params) {
-        System.out.println("Instantiating RHEAHybridPlayer with RHEAHybridParams params");
         randomGenerator = new Random(params.getRandomSeed());
         this.params = params;
         this.parameters = params;
-        this.mctsPlayer = new BasicMCTSPlayer(System.currentTimeMillis());
-        this.mcts_params = new BasicMCTSParams();
-        mcts_params.rolloutLength = params.mcts_rolloutLength;
-        this.mctsPlayer.parameters = mcts_params;
+        this.mcts_params = new BasicMCTSParams(System.currentTimeMillis());
+        this.mcts_params.rolloutLength = params.mcts_rolloutLength;
+        this.mcts_params.budgetType = params.budgetType;
+        this.mcts_params.budget = params.budget/2;
+        this.mctsPlayer = new BasicMCTSPlayer(this.mcts_params);
         setName("rhea_mcts_hybrid");
     }
 
@@ -67,19 +71,6 @@ public class RHEAHybridPlayer extends AbstractPlayer {
         repairCount = 0;
         nonRepairCount = 0;
 
-//        if (params.useMAST) {
-//            if (MASTStatistics == null) {
-//                MASTStatistics = new ArrayList<>();
-//                for (int i = 0; i < stateObs.getNPlayers(); i++)
-//                    MASTStatistics.add(new HashMap<>());
-//            } else {
-//                MASTStatistics = MASTStatistics.stream()
-//                        .map(m -> Utils.decay(m, params.discountFactor))
-//                        .collect(Collectors.toList());
-//            }
-//            mastPlayer = new MASTPlayer(null, 1.0, 0.0, System.currentTimeMillis(), 0.0);
-//            mastPlayer.setStats(MASTStatistics);
-//        }
         // Initialise individuals
         if (params.shiftLeft && !population.isEmpty()) {
             population.forEach(i -> i.value = Double.NEGATIVE_INFINITY);  // so that any we don't have time to shift are ignored when picking an action
@@ -95,8 +86,7 @@ public class RHEAHybridPlayer extends AbstractPlayer {
         }
         else {
             population = new ArrayList<>();
-            mctsPlayer.parameters.budgetType = params.budgetType;
-            mctsPlayer.parameters.budget = params.budget/2;
+
             mctsPlayer.setForwardModel(getForwardModel());
 
             RHEAIndividual individual = new RHEAIndividual(params.horizon, params.discountFactor, getForwardModel(), stateObs,
@@ -109,8 +99,8 @@ public class RHEAHybridPlayer extends AbstractPlayer {
                 population.add(new_individual);
                 fmCalls += calls.a;
                 copyCalls += calls.b;
-                repairCount += individual.repairCount;
-                nonRepairCount += individual.nonRepairCount;
+                repairCount += new_individual.repairCount;
+                nonRepairCount += new_individual.nonRepairCount;
             }
         }
 

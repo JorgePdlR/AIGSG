@@ -27,14 +27,12 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
                    int playerID, Random gen, IStateHeuristic heuristic,
                    AbstractPlayer rolloutPolicy) {
         // Initialize
-        System.out.println("RHEAINDIVIDUAL INIT: fm:"+fm.toString());
         this.gen = gen;
         this.discountFactor = discountFactor;
         actions = new AbstractAction[L];
         gameStates = new AbstractGameState[L + 1];
         this.heuristic = heuristic;
         this.rolloutPolicy = rolloutPolicy;
-        System.out.println("RHEAIndividual.<init> (line 36) rolloutPolicy fm:"+rolloutPolicy.getForwardModel());
         // Rollout with random actions and assign fitness value
         gameStates[0] = gs.copy();
         rollout(fm, 0, playerID, true);
@@ -47,7 +45,7 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
         length = I.length;
         discountFactor = I.discountFactor;
         heuristic = I.heuristic;
-        rolloutPolicy = I.rolloutPolicy.copy();
+        rolloutPolicy = I.rolloutPolicy;
 
         for (int i = 0; i < length; i++) {
             actions[i] = I.actions[i]; //.copy();
@@ -70,7 +68,6 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
      */
     public Pair<Integer, Integer> mutate(AbstractForwardModel fm, int playerID, int mutationCount) {
         // Find index from which to mutate individual, random in range of currently valid length
-//        System.out.println("MUTATE for player"+playerID);
         int startIndex = actions.length;
         for (int mutation = 0; mutation < mutationCount; mutation++) {
             int position = gen.nextInt(length); // we only consider actions up to the end of the game (which will therefore increase mutation rate towards game end)
@@ -101,7 +98,6 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
      * @return - number of calls to the FM.next() function
      */
     public Pair<Integer, Integer> rollout(AbstractForwardModel fm, int startIndex, int playerID, boolean repair) {
-        System.out.println("RHEA Individual rollout()");
         length = 0;
         double delta = 0;
         double previousScore = 0;
@@ -136,7 +132,6 @@ public class RHEAIndividual implements Comparable<RHEAIndividual> {
                 boolean illegalAction = !currentActions.contains(actions[i]);
                 illegalActions[i] = illegalAction;
                 if (illegalAction || actions[i] == null) {
-                    System.out.println("\tInside if");
                     oldActions[i] = actions[i];
                     action = rolloutPolicy.getAction(gsCopy, currentActions);
                     if (repair || actions[i] == null) // if we are repairing then we override an illegal action with a random legitimate one

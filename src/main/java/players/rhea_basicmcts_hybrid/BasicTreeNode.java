@@ -60,7 +60,6 @@ class BasicTreeNode {
      */
     void mctsSearch() {
         // Variables for tracking time budget
-        System.out.println("mcts search rollout Length:"+player.params.rolloutLength);
         double avgTimeTaken;
         double acumTimeTaken = 0;
         long remaining;
@@ -236,8 +235,6 @@ class BasicTreeNode {
      */
     private double rollOut() {
         int rolloutDepth = 0; // counting from end of tree
-        System.out.println("rolloutDepth: "+rolloutDepth);
-        System.out.println("mcts search rollout Length:"+player.params.rolloutLength);
         // If rollouts are enabled, select actions for the rollout in line with the rollout policy
         AbstractGameState rolloutState = state.copy();
         if (player.params.rolloutLength > 0) {
