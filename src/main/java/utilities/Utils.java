@@ -123,7 +123,7 @@ public abstract class Utils {
      * @param way8   - if true, grid has 8-way connectivity, otherwise just 4.
      * @return List of Vector2D, coordinates for valid neighbours
      */
-    public static java.util.List<Vector2D> getNeighbourhood(int x, int y, int width, int height, boolean way8) {
+    public static List<Vector2D> getNeighbourhood(int x, int y, int width, int height, boolean way8) {
         List<Vector2D> neighbours = new ArrayList<>();
 
         // Add orthogonal neighbours

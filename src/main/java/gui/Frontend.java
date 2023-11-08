@@ -492,7 +492,7 @@ public class Frontend extends GUI {
         // add a listener to detect every time an action has been taken
         gameRunning.addListener(new MetricsGameListener() {
             @Override
-            public void onEvent(evaluation.metrics.Event event)
+            public void onEvent(Event event)
             {
                 if(event.type == Event.GameEvent.ACTION_TAKEN)
                     updateSampleActions(event.state.copy());

@@ -61,7 +61,7 @@ public class Connect4GUIManager extends AbstractGUIManager {
     @Override
     protected void updateActionButtons(AbstractPlayer player, AbstractGameState gameState) {
         if (gameState.getGameStatus() == CoreConstants.GameResult.GAME_ONGOING) {
-            List<core.actions.AbstractAction> actions = player.getForwardModel().computeAvailableActions(gameState);
+            List<AbstractAction> actions = player.getForwardModel().computeAvailableActions(gameState);
             ArrayList<Rectangle> highlight = view.getHighlight();
 
             int start = actions.size();

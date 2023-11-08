@@ -39,12 +39,16 @@ public class OSLAPlayer extends AbstractPlayer {
 
     @Override
     public AbstractAction _getAction(AbstractGameState gs, List<AbstractAction> actions) {
+        System.out.println("\nOSLA _getAction");
+        System.out.println("AbstractGameState gs: "+gs.toString());
         double maxQ = Double.NEGATIVE_INFINITY;
         AbstractAction bestAction = null;
         double[] valState = new double[actions.size()];
         int playerID = gs.getCurrentPlayer();
+        System.out.println("playerID: "+playerID);
 
         for (int actionIndex = 0; actionIndex < actions.size(); actionIndex++) {
+            System.out.println("actionIndex: "+actionIndex+" of "+actions.size());
             AbstractAction action = actions.get(actionIndex);
             AbstractGameState gsCopy = gs.copy();
             getForwardModel().next(gsCopy, action);

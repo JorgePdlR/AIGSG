@@ -60,19 +60,19 @@ public class RHEAPlayer extends AbstractPlayer {
         repairCount = 0;
         nonRepairCount = 0;
 
-        if (params.useMAST) {
-            if (MASTStatistics == null) {
-                MASTStatistics = new ArrayList<>();
-                for (int i = 0; i < stateObs.getNPlayers(); i++)
-                    MASTStatistics.add(new HashMap<>());
-            } else {
-                MASTStatistics = MASTStatistics.stream()
-                        .map(m -> Utils.decay(m, params.discountFactor))
-                        .collect(Collectors.toList());
-            }
-            mastPlayer = new MASTPlayer(null, 1.0, 0.0, System.currentTimeMillis(), 0.0);
-            mastPlayer.setStats(MASTStatistics);
-        }
+//        if (params.useMAST) {
+//            if (MASTStatistics == null) {
+//                MASTStatistics = new ArrayList<>();
+//                for (int i = 0; i < stateObs.getNPlayers(); i++)
+//                    MASTStatistics.add(new HashMap<>());
+//            } else {
+//                MASTStatistics = MASTStatistics.stream()
+//                        .map(m -> Utils.decay(m, params.discountFactor))
+//                        .collect(Collectors.toList());
+//            }
+//            mastPlayer = new MASTPlayer(null, 1.0, 0.0, System.currentTimeMillis(), 0.0);
+//            mastPlayer.setStats(MASTStatistics);
+//        }
         // Initialise individuals
         if (params.shiftLeft && !population.isEmpty()) {
             population.forEach(i -> i.value = Double.NEGATIVE_INFINITY);  // so that any we don't have time to shift are ignored when picking an action

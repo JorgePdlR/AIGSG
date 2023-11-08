@@ -37,7 +37,7 @@ public class AreaView extends ComponentView {
 
         // Set up mouse adapter to handle clicks and drags
         MouseAdapter ma = new MouseAdapter() {
-            private java.util.Timer timer;
+            private Timer timer;
             private boolean selecting;
 
             @Override
@@ -126,7 +126,7 @@ public class AreaView extends ComponentView {
                         if (intersect) {
                             // If something was clicked on, start a timer for long clicks which move collections of components
                             if (timer == null) {
-                                timer = new java.util.Timer();
+                                timer = new Timer();
                             }
                             timer.schedule(new TimerTask() {
                                 @Override

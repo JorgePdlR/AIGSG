@@ -83,12 +83,12 @@ public class ActionFeatureListener extends FeatureListener {
         }
         int p = state.getCurrentPlayer();
         double[] phi = extractFeatureVector(action, state, p);
-        currentData.add(new StateFeatureListener.LocalDataWrapper(p, phi, state, getActionScore(action)));  // chosen
+        currentData.add(new LocalDataWrapper(p, phi, state, getActionScore(action)));  // chosen
         if (includeActionsNotTaken) {
             for (AbstractAction alternativeAction : availableActions) {
                 if (alternativeAction.equals(action)) continue;
                 phi = extractFeatureVector(alternativeAction, state, p);
-                currentData.add(new StateFeatureListener.LocalDataWrapper(p, phi, state, getActionScore(alternativeAction))); // not chosen
+                currentData.add(new LocalDataWrapper(p, phi, state, getActionScore(alternativeAction))); // not chosen
             }
         }
         actionValues.clear();

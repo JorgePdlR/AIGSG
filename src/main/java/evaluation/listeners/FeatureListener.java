@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
  */
 public abstract class FeatureListener implements IGameListener {
 
-    List<StateFeatureListener.LocalDataWrapper> currentData = new ArrayList<>();
+    List<LocalDataWrapper> currentData = new ArrayList<>();
     Event.GameEvent frequency;
     boolean currentPlayerOnly;
     IStatisticLogger logger;
@@ -64,7 +64,7 @@ public abstract class FeatureListener implements IGameListener {
         }).toArray();
         double[] ordinal = IntStream.range(0, totP).mapToDouble(state::getOrdinalPosition).toArray();
         double finalRound = state.getRoundCounter();
-        for (StateFeatureListener.LocalDataWrapper record : currentData) {
+        for (LocalDataWrapper record : currentData) {
             // we use a LinkedHashMap so that the order of the keys is preserved, and hence the
             // data is written to file in a sensible order for human viewing
             Map<String, Double> data = new LinkedHashMap<>();
@@ -124,11 +124,11 @@ public abstract class FeatureListener implements IGameListener {
         if (currentPlayerOnly && state.isNotTerminal()) {
             int p = state.getCurrentPlayer();
             double[] phi = extractFeatureVector(action, state, p);
-            currentData.add(new StateFeatureListener.LocalDataWrapper(p, phi, state, 0.0));
+            currentData.add(new LocalDataWrapper(p, phi, state, 0.0));
         } else {
             for (int p = 0; p < state.getNPlayers(); p++) {
                 double[] phi = extractFeatureVector(action, state, p);
-                currentData.add(new StateFeatureListener.LocalDataWrapper(p, phi, state, 0.0));
+                currentData.add(new LocalDataWrapper(p, phi, state, 0.0));
             }
         }
     }

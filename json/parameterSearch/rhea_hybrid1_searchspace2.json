@@ -1,0 +1,14 @@
+{
+  "class" : "players.rhea_basicmcts_hybrid.RHEAHybridParams",
+  "horizon": [9, 15, 24],
+  "populationSize": [2, 10, 15],
+  "mcts_rolloutLength": [1, 5, 10],
+  "tournamentSize" : 5,
+  "discountFactor": 0.9,
+  "childCount": 10,
+  "crossoverType": "UNIFORM",
+  "eliteCount": 1,
+  "selectionType" : "TOURNAMENT",
+  "budgetType" : "BUDGET_TIME",
+  "budget" : 999
+}

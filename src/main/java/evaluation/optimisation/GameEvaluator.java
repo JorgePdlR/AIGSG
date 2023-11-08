@@ -141,7 +141,7 @@ public class GameEvaluator implements SolutionEvaluator {
         double retValue = tuningGame ? gameHeuristic.evaluateGame(newGame) : stateHeuristic.evaluateState(newGame.getGameState(), playerOnTeam);
 
     //    System.out.println("GameEvaluator: " + retValue);
-
+        System.out.println("\nnEvals:"+nEvals+"\n");
         nEvals++;
         return retValue;
     }

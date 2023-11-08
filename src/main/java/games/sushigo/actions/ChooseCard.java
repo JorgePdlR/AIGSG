@@ -92,6 +92,7 @@ public class ChooseCard extends AbstractAction implements IExtendedSequence {
 
     @Override
     public String getString(AbstractGameState gameState) {
+//        System.out.println("cardIdx: "+cardIdx);
         return "Choose card " + getCard(gameState).getComponentName() + " [" + cardIdx + "] " + (useChopsticks ? " (+chopsticks)" : "");
     }
 

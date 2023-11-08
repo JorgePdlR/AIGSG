@@ -43,7 +43,7 @@ public class LoveLetterCard extends Card {
         // Action factory
         private BiFunction<LoveLetterGameState, PlayCard, List<AbstractAction>> generateFlatActions, generateDeepActions;
         static {
-            Princess.generateFlatActions = (gs, play) -> Collections.singletonList(new PlayCard(LoveLetterCard.CardType.Princess, play.getCardIdx(), play.getPlayerID(), -1, null, null, true, true));
+            Princess.generateFlatActions = (gs, play) -> Collections.singletonList(new PlayCard(CardType.Princess, play.getCardIdx(), play.getPlayerID(), -1, null, null, true, true));
             Handmaid.generateFlatActions = (gs, play) -> Collections.singletonList(new HandmaidAction(play.getCardIdx(), play.getPlayerID()));
             Countess.generateFlatActions = (gs, play) -> Collections.singletonList(
                     new PlayCard(Countess, play.getCardIdx(), play.getPlayerID(), -1, null, gs.needToForceCountess(gs.getPlayerHandCards().get(play.getPlayerID())), true, play.isDiscard()));
@@ -107,15 +107,15 @@ public class LoveLetterCard extends Card {
                     for (int targetPlayer = 0; targetPlayer < gs.getNPlayers(); targetPlayer++) {
                         if (targetPlayer == p || gs.getPlayerResults()[targetPlayer] == CoreConstants.GameResult.LOSE_ROUND || gs.isProtected(targetPlayer))
                             continue;
-                        for (LoveLetterCard.CardType type : LoveLetterCard.CardType.values()) {
-                            if (type != LoveLetterCard.CardType.Guard) {
+                        for (CardType type : CardType.values()) {
+                            if (type != CardType.Guard) {
                                 cardActions.add(new GuardAction(play.getCardIdx(), p, targetPlayer, type, true, discard));
                             }
                         }
                     }
                 } else {
-                    for (LoveLetterCard.CardType type : LoveLetterCard.CardType.values()) {
-                        if (type != LoveLetterCard.CardType.Guard) {
+                    for (CardType type : CardType.values()) {
+                        if (type != CardType.Guard) {
                             cardActions.add(new GuardAction(play.getCardIdx(), p, target, type, true, discard));
                         }
                     }
