@@ -1,16 +1,16 @@
 {
   "class" : "players.ModifiedMCTS.ModifiedMCTSParams",
   "K" : 1.4142,
-  "rolloutLength" : 100,
-  "maxTreeDepth" : 24,
+  "rolloutLength" : 12,
+  "maxTreeDepth" : 63,
   "heuristic" : {
     "class" : "players.heuristics.ScoreHeuristic"
   },
   "budgetType" : "BUDGET_TIME",
   "budget" : 999,
-  "reflexiveIterations" : 54,
+  "reflexiveIterations" : 24,
   "metamctsCalls" : 1,
   "reflexiveInOpponent" : false,
-  "reflexiveCalls" : 12,
+  "reflexiveCalls" : 15,
   "currentRound" : true
 }

@@ -18,7 +18,7 @@ public class ModifiedMCTSParams extends PlayerParameters {
     // equals to running Selection/Exploration Rollout and Backpropagation
     public int reflexiveIterations = 3;
     // Number of times "meta" MCTS. With a value of 0 equals to basic
-    // Monte Carlo. A value of 1 will call MCTS inside MCTS. A value
+    // Monte Carlo. A value of 1 it will call MCTS inside MCTS. A value of
     // 2 will call MCTS inside MCTS inside MCTS and so on...
     public int metamctsCalls = 1;
     // How many times will we call reflexive in the current MCTS

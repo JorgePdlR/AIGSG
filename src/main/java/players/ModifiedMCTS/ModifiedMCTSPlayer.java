@@ -67,7 +67,7 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
 
     @Override
     public String toString() {
-        return "RMCTS: MCALLS " + Integer.toString(this.params.metamctsCalls) + " CR " + Boolean.toString(this.params.currentRound) + " RO " + Boolean.toString(this.params.reflexiveInOpponent);
+        return "RMCTS";
     }
 
     @Override
