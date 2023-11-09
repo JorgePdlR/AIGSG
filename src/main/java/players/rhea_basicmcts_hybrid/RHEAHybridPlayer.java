@@ -41,7 +41,7 @@ public class RHEAHybridPlayer extends AbstractPlayer {
         this.mcts_params = new BasicMCTSParams(System.currentTimeMillis());
         this.mcts_params.rolloutLength = params.mcts_rolloutLength;
         this.mcts_params.budgetType = params.budgetType;
-        this.mcts_params.budget = params.budget/2;
+        this.mcts_params.budget = (int)((params.budget/(2*params.horizon)) * .70);
         this.mctsPlayer = new BasicMCTSPlayer(this.mcts_params);
         setName("rhea_mcts_hybrid");
     }

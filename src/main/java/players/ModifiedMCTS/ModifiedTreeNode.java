@@ -45,6 +45,8 @@ class ModifiedTreeNode {
     // performed to MCTS
     private int metamcts;
 
+    // Basically reflexive budget for level N, after budget is gone we will follow rolloutLength but by
+    // choosing random actions instead of calling MCTS in the rollouts.
     private int reflexiveNumberCalls;
 
     protected ModifiedTreeNode(ModifiedMCTSPlayer player, ModifiedTreeNode parent, AbstractGameState state, Random rnd) {
@@ -94,8 +96,8 @@ class ModifiedTreeNode {
             // Set how many times MCTS will call MCTS in a recursive way
             selected.metamcts = player.params.metamctsCalls;
             // Number of times reflexive MCTS will be used to choose best action
-            // in rollout. If we have no more calls, random actions will be used instead as
-            // basic MCTS
+            // in rollout. If we have no more calls, random actions will be used instead of
+            // MCTS.
             selected.reflexiveNumberCalls = player.params.reflexiveCalls;
 
             // Monte carlo rollout: return value of MC rollout from the newly added node
@@ -143,7 +145,7 @@ class ModifiedTreeNode {
 
         boolean stop = false;
 
-        // In reflexive MCTS we stop if we have no more iterations, where ech iteration is
+        // In reflexive MCTS we stop if we have no more iterations, where each iteration is
         // treePolicy + rollOut + backpropagation
         while (!stop) {
             // New timer for this iteration
@@ -328,8 +330,9 @@ class ModifiedTreeNode {
                     next = reflexiveRoot.bestAction();
                     reflexiveNumberCalls--;
                 }
-                // Get random action when we are not in a reflexive Monte Carlo all, or if we are in meta Monte Carlo, it
-                // is the opponents turn, reflexiveInOpponent is false or we have no more reflexive calls.
+                // Get random action when we are not in a reflexive Monte Carlo, if we are in the last Monte Carlo
+                // recursive call, it is the opponents turn and reflexiveInOpponent is false, or we have no more reflexive
+                // calls.
                 else {
                     next = randomPlayer.getAction(rolloutState, randomPlayer.getForwardModel().computeAvailableActions(rolloutState, randomPlayer.parameters.actionSpace));
                 }

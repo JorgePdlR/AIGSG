@@ -10,9 +10,8 @@ import java.util.Random;
 
 
 /**
- * This is a simple version of MCTS that may be useful for newcomers to TAG and MCTS-like algorithms
- * It strips out some of the additional configuration of MCTSPlayer. It uses BasicTreeNode in place of
- * SingleTreeNode.
+ * This is a simple version of MCTS with reflexive MCTS implemented.
+ * It uses BasicTreeNode in place of SingleTreeNode.
  */
 public class ModifiedMCTSPlayer extends AbstractPlayer {
 
@@ -30,14 +29,14 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
 
         // These parameters can be changed, and will impact the Basic MCTS algorithm
         this.params.K = Math.sqrt(2);
-        this.params.rolloutLength = 10;
-        this.params.maxTreeDepth = 5;
+        this.params.rolloutLength = 12;
+        this.params.maxTreeDepth = 63;
         this.params.epsilon = 1e-6;
-        this.params.reflexiveIterations = 3;
+        this.params.reflexiveIterations = 24;
         this.params.metamctsCalls = 1;
-        this.params.reflexiveCalls = 3;
+        this.params.reflexiveCalls = 15;
         this.params.reflexiveInOpponent = false;
-        this.params.currentRound = false;
+        this.params.currentRound = true;
 
     }
 
@@ -67,7 +66,7 @@ public class ModifiedMCTSPlayer extends AbstractPlayer {
 
     @Override
     public String toString() {
-        return "RMCTS";
+        return "Modified MCTS";
     }
 
     @Override
