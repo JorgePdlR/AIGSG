@@ -1,3 +1,5 @@
+# This is a fork from https://github.com/GAIGResearch/TabletopGames created as a class project to implement enhancements to the vanilla MCTS agent. 
+
 # TAG: [Tabletop Games Framework](http://www.tabletopgames.ai/)
 
 [![license](https://img.shields.io/github/license/GAIGResearch/TabletopGames)](LICENSE)
